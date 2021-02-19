@@ -33,7 +33,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   static const int ACTIVITY_LOG_CAP = 100;
   static const List<int> _playCount = [1, 10, 100, 1000, 5000];
   List<MyAudioPlayer> _activePlayers = [];
@@ -41,10 +42,22 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _delayedPlayed = false;
   bool _cancelPlaybacks = false;
   Uint8List audioData;
+  Animation<double> animation;
+  AnimationController controller;
 
   @override
   void initState() {
     super.initState();
+
+    controller =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this);
+    animation = Tween<double>(begin: 280, end: 350).animate(controller)
+      ..addListener(() {
+        setState(() {
+          // The state that has changed here is the animation object’s value.
+        });
+      });
+    controller.repeat(reverse: true);
 
     initStateAsync();
   }
@@ -70,6 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: SingleChildScrollView(
           child: Column(children: [
+            SizedBox(height: 30),
+            Container(
+              width: animation.value,
+              height: 20,
+              color: Colors.grey,
+              alignment: Alignment.center,
+              child: Text('Animation to keep state up-to-date'),
+            ),
             SizedBox(height: 30),
             ..._buildButtons(),
             SizedBox(height: 30),
