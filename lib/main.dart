@@ -38,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<int> _playCount = [1, 10, 100, 1000, 5000];
   List<MyAudioPlayer> _activePlayers = [];
   List<bool> _playing = List.generate(_playCount.length, (index) => false);
+  bool _delayedPlayed = false;
   bool _cancelPlaybacks = false;
   Uint8List audioData;
 
@@ -72,6 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 30),
             ..._buildButtons(),
             SizedBox(height: 30),
+            _buildDelayedPlayedButton(),
+            SizedBox(height: 30),
             _buildStopButton(),
             SizedBox(height: 30),
             _buildCancelButton(),
@@ -89,6 +92,22 @@ class _MyHomePageState extends State<MyHomePage> {
       color: Colors.red,
       disabledColor: Colors.red.withAlpha(100),
       onPressed: _playing.any((p) => p) ? () => _cancelPlaybacks = true : null,
+    );
+  }
+
+  Widget _buildDelayedPlayedButton() {
+    return MaterialButton(
+      child: Text('Delay 5s => play foo.mp3 (x1)'),
+      color: Colors.yellow,
+      disabledColor: Colors.yellow.withAlpha(100),
+      onPressed: _delayedPlayed
+          ? null
+          : () async {
+              setState(() => _delayedPlayed = true);
+              await Future.delayed(Duration(seconds: 5));
+              await MyAudioPlayer().playAndWait(audioData);
+              setState(() => _delayedPlayed = false);
+            },
     );
   }
 
